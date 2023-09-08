@@ -38,7 +38,7 @@ static func search_res(p_regex = ""):
 		regex = RegEx.new()
 		regex.compile(p_regex)
 		if not regex.is_valid():
-			print("WARNING: (res://addons/godot-inheritance-dock/res_utility.gd::search_res) regex failed to compile: ", p_regex)
+			print("WARNING: (res://addons/godot_inheritance_dock/res_utility.gd::search_res) regex failed to compile: ", p_regex)
 			return {}	
 
 	var dirs = ["res://"]
@@ -94,7 +94,7 @@ static func build_file_tree_dict(p_sort = SORT_SCENE_INHERITANCE):
 	}
 
 	# fetch all new files from res://
-	var this = load("res://addons/godot-inheritance-dock/res_utility.gd")
+	var this = load("res://addons/godot_inheritance_dock/res_utility.gd")
 	assert(this)
 	var temp_files = this.search_res(REGEX[p_sort])
 	var inserted_map = {}

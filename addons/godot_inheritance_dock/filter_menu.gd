@@ -12,7 +12,7 @@ signal item_sync_requested(p_popup, p_item)
 
 const FilterMenuItemScene = preload("filter_menu_item.tscn")
 
-const CONFIG_PATH = "res://addons/godot-inheritance-dock/godot_inheritance_dock.cfg"
+const CONFIG_PATH = "res://addons/godot_inheritance_dock/godot_inheritance_dock.cfg"
 
 ##### EXPORTS #####
 
@@ -109,7 +109,7 @@ func _on_save_filters_button_pressed():
 
 func _on_reload_filters_button_pressed():
 	if not _config:
-		print("WARNING: (res://addons/godot-inheritance-dock/filter_menu.gd::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference")
+		print("WARNING: (res://addons/godot_inheritance_dock/filter_menu.gd::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference")
 		return
 	var new_filters = _config.get_value("filters", type+"_filters")
 	set_filters(new_filters)

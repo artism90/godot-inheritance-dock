@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/icon_add.svg-01aba6062d1b23a16b4ce74d4fab9c32.stex"
+path="res://.import/icon_basetype.svg-353e2ae788e434db320ab01a059e1b8d.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/godot-inheritance-dock/icons/icon_add.svg"
-dest_files=[ "res://.import/icon_add.svg-01aba6062d1b23a16b4ce74d4fab9c32.stex" ]
+source_file="res://addons/godot_inheritance_dock/icons/icon_basetype.svg"
+dest_files=[ "res://.import/icon_basetype.svg-353e2ae788e434db320ab01a059e1b8d.stex" ]
 
 [params]
 

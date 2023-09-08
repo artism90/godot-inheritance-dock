@@ -9,7 +9,7 @@ metadata={
 
 [deps]
 
-source_file="res://addons/godot-inheritance-dock/icons/icon_resource.svg"
+source_file="res://addons/godot_inheritance_dock/icons/icon_resource.svg"
 dest_files=[ "res://.import/icon_resource.svg-97398f6feff4e7d30c308db5fa57d839.stex" ]
 
 [params]
