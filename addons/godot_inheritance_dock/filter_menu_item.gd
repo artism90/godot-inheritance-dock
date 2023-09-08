@@ -1,5 +1,7 @@
-tool
+@tool
 extends HBoxContainer
+
+## Contains one RegEx rule inside a [code]FilterMenu[/code].
 
 ##### CLASSES #####
 
@@ -27,24 +29,24 @@ const REGEX_MAP = {
 # public
 
 # public onready
-onready var check = $CheckBox
-onready var name_edit = $NameEdit
-onready var regex_edit = $RegExEdit
-onready var sync_button = $SyncButton
-onready var remove_button = $RemoveButton
-onready var regex_valid = $RegExValid
+@onready var check = $CheckBox
+@onready var name_edit = $NameEdit
+@onready var regex_edit = $RegExEdit
+@onready var sync_button = $SyncButton
+@onready var remove_button = $RemoveButton
+@onready var regex_valid = $RegExValid
 
 # private
-var _regex = RegEx.new() setget , get_regex
+var _regex = RegEx.new(): get = get_regex
 
 ##### NOTIFICATIONS #####
 
 func _ready():
-	check.connect("toggled", self, "_on_check_toggled")
-	name_edit.connect("text_changed", self, "_on_name_edit_text_changed")
-	regex_edit.connect("text_changed", self, "_on_regex_edit_text_changed")
-	sync_button.connect("pressed", self, "_on_sync_button_pressed")
-	remove_button.connect("pressed", self, "_on_remove_button_pressed")
+	check.toggled.connect(_on_check_toggled)
+	name_edit.text_changed.connect(_on_name_edit_text_changed)
+	regex_edit.text_changed.connect(_on_regex_edit_text_changed)
+	sync_button.pressed.connect(_on_sync_button_pressed)
+	remove_button.pressed.connect(_on_remove_button_pressed)
 	_update_regex_valid()
 
 ##### OVERRIDES #####
