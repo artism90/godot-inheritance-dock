@@ -23,6 +23,7 @@ const REGEX_MAP = {
 }
 
 const FilterMenuItem = preload("filter_menu_item.gd")
+const PluginTranslation = preload("plugin_translation.gd")
 
 ##### EXPORTS #####
 
@@ -50,6 +51,9 @@ func _ready() -> void:
 	sync_button.pressed.connect(_on_sync_button_pressed)
 	remove_button.pressed.connect(_on_remove_button_pressed)
 	_update_regex_valid()
+
+	regex_edit.placeholder_text = PluginTranslation.localize("KEY_REGEX_FILEPATH")
+	sync_button.tooltip_text = PluginTranslation.localize("KEY_SYNC_FILTER")
 
 ##### OVERRIDES #####
 

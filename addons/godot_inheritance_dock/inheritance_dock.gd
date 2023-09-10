@@ -28,6 +28,7 @@ const Util = preload("res_utility.gd")
 const FilterMenuScene = preload("filter_menu.tscn")
 const FilterMenu = preload("filter_menu.gd")
 const FilterMenuItem = preload("filter_menu_item.gd")
+const PluginTranslation = preload("plugin_translation.gd")
 
 const TITLE = "Inheritance"
 const SCRIPT_ICON = preload("icons/icon_script.svg")
@@ -153,6 +154,15 @@ func _ready() -> void:
 	_filter_popups.append(_resource_filter_popup)
 
 	# UI Initialization
+	scene_tab_button.text = PluginTranslation.localize("KEY_SCENES")
+	script_tab_button.text = PluginTranslation.localize("KEY_SCRIPTS")
+	resource_tab_button.text = PluginTranslation.localize("KEY_RESOURCES")
+
+	extend_button.tooltip_text = PluginTranslation.localize("KEY_TOOLTIP_EXTEND_TYPE")
+	instance_button.tooltip_text = PluginTranslation.localize("KEY_TOOLTIP_INSTANCIATE_NODE")
+	find_button.tooltip_text = PluginTranslation.localize("KEY_TOOLTIP_FIND_IN_FILE_SYSTEM")
+
+	class_filter_edit.placeholder_text = PluginTranslation.localize("KEY_FILTER_BY_CLASS")
 	set_mode(_mode)
 
 	_ready_done = true
@@ -454,7 +464,7 @@ func set_mode(p_mode: Mode) -> void:
 			tree = scene_tree
 			tree_dict = _scene_dict
 			_collapsed_set = _scene_collapsed_set
-	search_edit.placeholder_text = "filter " + _mode_to_name() + "s"
+	search_edit.placeholder_text = PluginTranslation.localize("KEY_FILTER_" + _mode_to_name().to_upper() + "S")
 	if not (_cache_flags & CACHE_MAP[_mode]):
 		_build_tree_from_tree_dict(tree, tree_dict)
 		_cache_flags |= CACHE_MAP[_mode]
