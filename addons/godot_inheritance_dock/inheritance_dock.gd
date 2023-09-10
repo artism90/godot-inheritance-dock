@@ -58,6 +58,8 @@ var filter_popup: PopupPanel = null
 var tree: Tree = null
 var tree_dict := {}
 
+var translation := preload("translation.gd")
+
 # public onready
 @onready var scene_tab_button := $VBoxContainer/TypeContainer/Scenes as Button
 @onready var script_tab_button := $VBoxContainer/TypeContainer/Scripts as Button
@@ -152,6 +154,15 @@ func _ready() -> void:
 	_filter_popups.append(_resource_filter_popup)
 
 	# UI Initialization
+	scene_tab_button.text = translation.localize("KEY_SCENES")
+	script_tab_button.text = translation.localize("KEY_SCRIPTS")
+	resource_tab_button.text = translation.localize("KEY_RESOURCES")
+
+	extend_button.tooltip_text = translation.localize("KEY_TOOLTIP_EXTEND_TYPE")
+	instance_button.tooltip_text = translation.localize("KEY_TOOLTIP_INSTANCIATE_NODE")
+	find_button.tooltip_text = translation.localize("KEY_TOOLTIP_FIND_IN_FILE_SYSTEM")
+
+	class_filter_edit.placeholder_text = translation.localize("KEY_FILTER_BY_CLASS")
 	set_mode(_mode)
 
 	_ready_done = true
@@ -453,7 +464,7 @@ func set_mode(p_mode: int) -> void:
 			tree = scene_tree
 			tree_dict = _scene_dict
 			_collapsed_set = _scene_collapsed_set
-	search_edit.placeholder_text = "filter " + _mode_to_name() + "s"
+	search_edit.placeholder_text = translation.localize("KEY_FILTER_" + _mode_to_name().to_upper() + "S")
 	if not (_cache_flags & CACHE_MAP[_mode]):
 		_build_tree_from_tree_dict(tree, tree_dict)
 		_cache_flags |= CACHE_MAP[_mode]

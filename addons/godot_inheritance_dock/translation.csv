@@ -1,0 +1,21 @@
+keys|de|en
+KEY_TITLE|Vererbung|Inheritance
+KEY_SCENES|Szenen|Scenes
+KEY_SCRIPTS|Skripte|Scripts
+KEY_RESOURCES|Ressourcen|Resources
+KEY_FILTER_SCENES|nach Szenen filtern|filter scenes
+KEY_FILTER_SCRIPTS|nach Skripten filtern|filter scripts
+KEY_FILTER_RESOURCES|nach Ressourcen filtern|filter resources
+KEY_TOOLTIP_EXTEND_TYPE|Neuen Typ von ausgewähltem Objekt ableiten.|Extend this object with a new type that inherits the selected object.
+KEY_TOOLTIP_INSTANCIATE_NODE|Ausgewähltes Objekt an aktuell selektierten Node im Szenendock anhängen.\nAusgeblendet für Nicht-Node-Skripte und Nicht-Szenen-Ressourcen.|Instanciate this object under the Scene dock's selected node.\nDisabled for non-Node scripts and non-scene resources.
+KEY_TOOLTIP_FIND_IN_FILE_SYSTEM|Diese Ressource im Dateisystem-Dock zeigen.|Reveal this resource in the FileSystem dock.
+KEY_FILTER_BY_CLASS|nach Klasse filtern|filter by class
+KEY_TOOLTIP_ADD_FILTER|Neuen Filter am Listenende anlegen.|Add a new filter to the end of the filter list.
+KEY_TOOLTIP_RELOAD_FILTERS|Gespeicherte Filterliste aus Konfigurationsdatei wiederherstellen.|Reload the filter list from the config file.
+KEY_TOOLTIP_SAVE_FILTERS|Aktuelle Filterliste in Konfigurationsdatei abspeichern.|Save the current filter list to the config file.
+KEY_FILTER_LIST|Filterliste|Filter List
+KEY_REGEX_FILEPATH|RegEx-Dateipfad|RegEx Filepath
+KEY_SYNC_FILTER|Übernehme den Filter für alle Tabs.\nWenn ein Tab diesen Filter noch nicht hat, wird er neu angelegt.|Synchronizes this filter item across all tabs.\nIf a tab does not have it, one will be created.
+KEY_UNDO_REDO_INSTANCIATE_SCENE_UNDER_NODE,Szene unter Node-Auswahl instanziieren,Instance Scene Under Selected Nodes
+KEY_UNDO_REDO_INSTANCIATE_SCRIPT_UNDER_NODE,Skript unter Node-Auswahl instanziieren,Instance Script Under Selected Nodes
+KEY_UNDO_REDO_ADD_SCRIPT_UNDER_NODE,Skript an Node-Auswahl anhängen,Add Script To Selected Nodes

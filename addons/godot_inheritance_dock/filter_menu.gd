@@ -26,11 +26,14 @@ const CONFIG_PATH = "res://addons/godot_inheritance_dock/godot_inheritance_dock.
 var filters := []: get = get_filters, set = set_filters
 var type := ""
 
+var translation := preload("translation.gd")
+
 # public onready
 @onready var add_filter_button := $PanelContainer/VBoxContainer/HBoxContainer/AddFilterButton as Button
 @onready var save_filters_button := $PanelContainer/VBoxContainer/HBoxContainer/SaveFiltersButton as Button
 @onready var reload_filters_button := $PanelContainer/VBoxContainer/HBoxContainer/ReloadFiltersButton as Button
 @onready var filter_vbox := $PanelContainer/VBoxContainer/FilterVbox as VBoxContainer
+@onready var filter_list_label := $PanelContainer/VBoxContainer/HBoxContainer/Label as Label
 
 # private
 var _config: ConfigFile = null: set = set_config
@@ -43,6 +46,11 @@ func _ready() -> void:
 	reload_filters_button.pressed.connect(_on_reload_filters_button_pressed)
 	reload_filters_button.disabled = false
 	call_deferred("_set_save_disabled", true)
+
+	add_filter_button.tooltip_text = translation.localize("KEY_TOOLTIP_ADD_FILTER")
+	save_filters_button.tooltip_text = translation.localize("KEY_TOOLTIP_SAVE_FILTERS")
+	reload_filters_button.tooltip_text = translation.localize("KEY_TOOLTIP_RELOAD_FILTERS")
+	filter_list_label.text = translation.localize("KEY_FILTER_LIST")
 
 ##### OVERRIDES #####
 

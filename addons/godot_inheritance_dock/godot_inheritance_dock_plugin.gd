@@ -19,6 +19,8 @@ var selected = null
 var scene_file_dialog := EditorFileDialog.new()
 var res_file_dialog := EditorFileDialog.new()
 
+var translation := preload("translation.gd")
+
 # public onready
 
 # private
@@ -30,7 +32,7 @@ var _undo_redo: EditorUndoRedoManager = null
 
 func _enter_tree() -> void:
 	dock = preload("inheritance_dock.tscn").instantiate() as PanelContainer
-	dock.set_name(dock.TITLE)
+	dock.set_name(translation.localize("KEY_TITLE"))
 	add_control_to_dock(DOCK_SLOT_RIGHT_UR, dock)
 
 	dock.add_script_request.connect(_on_add_script_request)
@@ -123,7 +125,7 @@ func _on_add_script_request(p_script_path: String) -> void:
 	if not script or not ClassDB.can_instantiate(script.get_instance_base_type()):
 		return
 
-	_undo_redo.create_action("Add Script To Selected Nodes", UndoRedo.MERGE_ALL)
+	_undo_redo.create_action(translation.localize("KEY_UNDO_REDO_ADD_SCRIPT_UNDER_NODE"), UndoRedo.MERGE_ALL)
 	for a_node in nodes:
 		var a_script: Script = a_node.get_script()
 		_undo_redo.add_do_method(a_node, "set_script", script)
@@ -145,7 +147,7 @@ func _on_instance_script_request(p_script_path: String) -> void:
 	if not script or not ClassDB.can_instantiate(script.get_instance_base_type()):
 		return
 
-	_undo_redo.create_action("Instance Script Under Selected Nodes", UndoRedo.MERGE_ALL)
+	_undo_redo.create_action(translation.localize("KEY_UNDO_REDO_INSTANCIATE_SCRIPT_UNDER_NODE"), UndoRedo.MERGE_ALL)
 	if not nodes.is_empty():
 		for a_selected_node in get_editor_interface().get_selection().get_selected_nodes():
 			_undo_redo.add_undo_method(get_editor_interface().get_selection(), "add_node", a_selected_node)
@@ -183,7 +185,7 @@ func _on_instance_scene_request(p_scene_path: String) -> void:
 	if not scene:
 		return
 
-	_undo_redo.create_action("Instance Scene Under Selected Nodes", UndoRedo.MERGE_ALL)
+	_undo_redo.create_action(translation.localize("KEY_UNDO_REDO_INSTANCIATE_SCENE_UNDER_NODE"), UndoRedo.MERGE_ALL)
 	if not nodes.is_empty():
 		for a_selected_node in get_editor_interface().get_selection().get_selected_nodes():
 			_undo_redo.add_undo_method(get_editor_interface().get_selection(), "add_node", a_selected_node)

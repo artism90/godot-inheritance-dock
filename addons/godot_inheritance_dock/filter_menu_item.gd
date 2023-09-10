@@ -28,6 +28,8 @@ const REGEX_MAP = {
 
 # public
 
+var translation := preload("translation.gd")
+
 # public onready
 @onready var check := $CheckBox as CheckBox
 @onready var name_edit := $NameEdit as LineEdit
@@ -48,6 +50,9 @@ func _ready() -> void:
 	sync_button.pressed.connect(_on_sync_button_pressed)
 	remove_button.pressed.connect(_on_remove_button_pressed)
 	_update_regex_valid()
+
+	regex_edit.placeholder_text = translation.localize("KEY_REGEX_FILEPATH")
+	sync_button.tooltip_text = translation.localize("KEY_SYNC_FILTER")
 
 ##### OVERRIDES #####
 
