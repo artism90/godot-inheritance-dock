@@ -121,7 +121,7 @@ func _on_save_filters_button_pressed() -> void:
 
 func _on_reload_filters_button_pressed() -> void:
 	if not _config:
-		print("WARNING: (res://addons/godot_inheritance_dock/filter_menu.gd::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference")
+		print("WARNING: ({0}::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference".format([get_script().get_path()]))
 		return
 
 	var new_filters: Dictionary = _config.get_value("filters", type+"_filters")
