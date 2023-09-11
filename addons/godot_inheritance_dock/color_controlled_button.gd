@@ -1,15 +1,15 @@
 @tool
 extends BaseButton
 
-@export var hover_color = Color(1.0, 1.0, 1.0, 0.7)
-@export var natural_color = Color(1.0, 1.0, 1.0, 1.0)
-@export var pressed_color = Color("54b7e7")
-@export var disabled_color = Color(0.5, 0.5, 0.5, 1.0)
-@export var use_material_pressed = true
+@export var hover_color := Color(1.0, 1.0, 1.0, 0.7)
+@export var natural_color := Color(1.0, 1.0, 1.0, 1.0)
+@export var pressed_color := Color("54b7e7")
+@export var disabled_color := Color(0.5, 0.5, 0.5, 1.0)
+@export var use_material_pressed := true
 
-var hovering = false
+var hovering := false
 
-func _ready():
+func _ready() -> void:
 	mouse_entered.connect(on_mouse_entered)
 	mouse_exited.connect(on_mouse_exited)
 	if toggle_mode:
@@ -22,30 +22,30 @@ func _ready():
 	if button_pressed:
 		update_button_group()
 
-func on_mouse_entered():
+func on_mouse_entered() -> void:
 	hovering = true
 	if not button_pressed and not toggle_mode and not disabled:
 		self_modulate = hover_color
 
-func on_mouse_exited():
+func on_mouse_exited() -> void:
 	hovering = false
 	if not button_pressed and not toggle_mode and not disabled:
 		self_modulate = natural_color
 
-func on_button_down():
+func on_button_down() -> void:
 	if hovering:
 		update_button_group()
 
-func on_button_up():
+func on_button_up() -> void:
 	self_modulate = hover_color
 	if use_material_pressed:
 		material.blend_mode = CanvasItemMaterial.BLEND_MODE_MIX
 
-func on_toggled(p_toggle):
+func on_toggled(p_toggle: bool) -> void:
 	if p_toggle:
 		update_button_group()
 
-func update_button_group():
+func update_button_group() -> void:
 	if not button_group:
 		button_pressed = true
 		if use_material_pressed:

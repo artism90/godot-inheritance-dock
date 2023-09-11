@@ -29,19 +29,19 @@ const REGEX_MAP = {
 # public
 
 # public onready
-@onready var check = $CheckBox
-@onready var name_edit = $NameEdit
-@onready var regex_edit = $RegExEdit
-@onready var sync_button = $SyncButton
-@onready var remove_button = $RemoveButton
-@onready var regex_valid = $RegExValid
+@onready var check := $CheckBox as CheckBox
+@onready var name_edit := $NameEdit as LineEdit
+@onready var regex_edit := $RegExEdit as LineEdit
+@onready var sync_button := $SyncButton as Button
+@onready var remove_button := $RemoveButton as Button
+@onready var regex_valid := $RegExValid as TextureRect
 
 # private
-var _regex = RegEx.new(): get = get_regex
+var _regex := RegEx.new(): get = get_regex
 
 ##### NOTIFICATIONS #####
 
-func _ready():
+func _ready() -> void:
 	check.toggled.connect(_on_check_toggled)
 	name_edit.text_changed.connect(_on_name_edit_text_changed)
 	regex_edit.text_changed.connect(_on_regex_edit_text_changed)
@@ -55,35 +55,35 @@ func _ready():
 
 ##### PUBLIC METHODS #####
 
-func is_valid():
+func is_valid() -> bool:
 	return _regex.is_valid() and _regex.get_pattern()
 
 ##### PRIVATE METHODS #####
 
-func _update_regex_valid():
+func _update_regex_valid() -> void:
 	regex_valid.texture = REGEX_MAP[is_valid()]
 
 ##### CONNECTIONS #####
 
-func _on_check_toggled(p_toggle):
+func _on_check_toggled(p_toggle: bool) -> void:
 	emit_signal("checkbox_updated")
 
-func _on_name_edit_text_changed(p_text):
+func _on_name_edit_text_changed(p_text: String) -> void:
 	emit_signal("name_updated")
 
-func _on_regex_edit_text_changed(p_text):
+func _on_regex_edit_text_changed(p_text: String) -> void:
 	_regex.compile(p_text)
 	_update_regex_valid()
 	emit_signal("regex_updated")
 
-func _on_sync_button_pressed():
+func _on_sync_button_pressed() -> void:
 	emit_signal("item_sync_requested", self)
 
-func _on_remove_button_pressed():
+func _on_remove_button_pressed() -> void:
 	emit_signal("item_removed")
 	queue_free()
 
-##### SETTERS AND GETTERS ####!#
+##### SETTERS AND GETTERS #####
 
-func get_regex():
+func get_regex() -> RegEx:
 	return _regex
