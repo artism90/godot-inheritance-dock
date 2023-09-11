@@ -8,16 +8,16 @@ extends PanelContainer
 ##### SIGNALS #####
 
 signal load_failed
-signal add_script_request(p_script_path)
-signal extend_script_request(p_script_path)
-signal instance_script_request(p_script_path)
-signal edit_script_request(p_script_path)
-signal extend_scene_request(p_scene_path)
-signal instance_scene_request(p_scene_path)
-signal edit_scene_request(p_scene_path)
-signal new_res_request(p_res_type, p_script_path)
-signal edit_res_request(p_res_path)
-signal file_selected(p_file)
+signal add_script_request(p_script_path: String)
+signal extend_script_request(p_script_path: String)
+signal instance_script_request(p_script_path: String)
+signal edit_script_request(p_script_path: String)
+signal extend_scene_request(p_scene_path: String)
+signal instance_scene_request(p_scene_path: String)
+signal edit_scene_request(p_scene_path: String)
+signal new_res_request(p_script_path: String)
+signal edit_res_request(p_res_path: String)
+signal file_selected(p_file: String)
 
 ##### CONSTANTS #####
 
@@ -26,6 +26,8 @@ enum Caches {CACHE_NONE = 0, CACHE_SCENE = 1, CACHE_SCRIPT = 2, CACHE_RES = 4}
 
 const Util = preload("res_utility.gd")
 const FilterMenuScene = preload("filter_menu.tscn")
+const FilterMenu = preload("filter_menu.gd")
+const FilterMenuItem = preload("filter_menu_item.gd")
 
 const TITLE = "Inheritance"
 const SCRIPT_ICON = preload("icons/icon_script.svg")
@@ -50,59 +52,59 @@ const CACHE_MAP = {
 ##### MEMBERS #####
 
 # public
-var filters = []
-var files = []
+var filters := []
+var files := []
 var selected = null
-var filter_popup = null
-var tree = null
-var tree_dict = null
+var filter_popup: FilterMenu
+var tree: Tree
+var tree_dict := {}
 
 # public onready
-@onready var scene_tab_button = $VBoxContainer/TypeContainer/Scenes
-@onready var script_tab_button = $VBoxContainer/TypeContainer/Scripts
-@onready var resource_tab_button = $VBoxContainer/TypeContainer/Resources
-@onready var filter_menu_button = $VBoxContainer/HBoxContainer/FilterContainer/FilterMenuButton
-@onready var scene_tree = $VBoxContainer/TabContainer/Scenes
-@onready var script_tree = $VBoxContainer/TabContainer/Scripts
-@onready var resource_tree = $VBoxContainer/TabContainer/Resources
-@onready var search_edit = $VBoxContainer/SearchContainer/LineEdit
-@onready var new_file_button = $VBoxContainer/HBoxContainer/ToolContainer/NewFileButton
-@onready var add_script_button = $VBoxContainer/HBoxContainer/ToolContainer/AddScriptButton
-@onready var extend_button = $VBoxContainer/HBoxContainer/ToolContainer/ExtendButton
-@onready var instance_button = $VBoxContainer/HBoxContainer/ToolContainer/InstanceButton
-@onready var find_button = $VBoxContainer/HBoxContainer/ToolContainer/FindButton
-@onready var class_filter_edit = $VBoxContainer/HBoxContainer/FilterContainer/ClassFilterEdit
-@onready var tab = $VBoxContainer/TabContainer
+@onready var scene_tab_button := $VBoxContainer/TypeContainer/Scenes as Button
+@onready var script_tab_button := $VBoxContainer/TypeContainer/Scripts as Button
+@onready var resource_tab_button := $VBoxContainer/TypeContainer/Resources as Button
+@onready var filter_menu_button := $VBoxContainer/HBoxContainer/FilterContainer/FilterMenuButton as Button
+@onready var scene_tree := $VBoxContainer/TabContainer/Scenes as Tree
+@onready var script_tree := $VBoxContainer/TabContainer/Scripts as Tree
+@onready var resource_tree := $VBoxContainer/TabContainer/Resources as Tree
+@onready var search_edit := $VBoxContainer/SearchContainer/LineEdit as LineEdit
+@onready var new_file_button := $VBoxContainer/HBoxContainer/ToolContainer/NewFileButton as Button
+@onready var add_script_button := $VBoxContainer/HBoxContainer/ToolContainer/AddScriptButton as Button
+@onready var extend_button := $VBoxContainer/HBoxContainer/ToolContainer/ExtendButton as Button
+@onready var instance_button := $VBoxContainer/HBoxContainer/ToolContainer/InstanceButton as Button
+@onready var find_button := $VBoxContainer/HBoxContainer/ToolContainer/FindButton as Button
+@onready var class_filter_edit := $VBoxContainer/HBoxContainer/FilterContainer/ClassFilterEdit as LineEdit
+@onready var tab := $VBoxContainer/TabContainer as TabContainer
 
 # private
-var _config = ConfigFile.new()
-var _config_loaded = false
-var _scene_dict = null
-var _script_dict = null
-var _resource_dict = null
-var _scene_collapsed_set = {}
-var _script_collapsed_set = {}
-var _resource_collapsed_set = {}
-var _collapsed_set = null
-var _sort = Util.SORT_SCENE_INHERITANCE
-var _mode = Mode.SCENE_MODE: set = set_mode
-var _scene_filter_popup = null
-var _script_filter_popup = null
-var _resource_filter_popup = null
-var _filter_popups = []
-var _search_filter = "": set = set_search_filter
-var _class_filter = "": set = set_class_filter
-var _ready_done = false
-var _cache_flags = Caches.CACHE_NONE
+var _config := ConfigFile.new()
+var _config_loaded := false
+var _scene_dict := {}
+var _script_dict := {}
+var _resource_dict := {}
+var _scene_collapsed_set := {}
+var _script_collapsed_set := {}
+var _resource_collapsed_set := {}
+var _collapsed_set := {}
+var _sort := Util.SORT_SCENE_INHERITANCE
+var _mode := Mode.SCENE_MODE: set = set_mode
+var _scene_filter_popup: FilterMenu
+var _script_filter_popup: FilterMenu
+var _resource_filter_popup: FilterMenu
+var _filter_popups: Array[FilterMenu]
+var _search_filter := "": set = set_search_filter
+var _class_filter := "": set = set_class_filter
+var _ready_done := false
+var _cache_flags := Caches.CACHE_NONE
 
 ##### NOTIFICATIONS #####
 
-func _init():
+func _init() -> void:
 	_init_config()
 	if not _config_loaded:
 		emit_signal("load_failed")
 
-func _ready():
+func _ready() -> void:
 	if not _config_loaded:
 		return
 
@@ -126,7 +128,7 @@ func _ready():
 	resource_tree.item_activated.connect(_on_item_activated)
 
 	# Filters Initialization
-	_scene_filter_popup = FilterMenuScene.instantiate()
+	_scene_filter_popup = FilterMenuScene.instantiate() as FilterMenu
 	add_child(_scene_filter_popup)
 	_scene_filter_popup.type = "scene"
 	_scene_filter_popup.filters_updated.connect(_update_filters)
@@ -134,7 +136,7 @@ func _ready():
 	_scene_filter_popup.set_config(_config)
 	_filter_popups.append(_scene_filter_popup)
 
-	_script_filter_popup = FilterMenuScene.instantiate()
+	_script_filter_popup = FilterMenuScene.instantiate() as FilterMenu
 	add_child(_script_filter_popup)
 	_script_filter_popup.type = "script"
 	_script_filter_popup.filters_updated.connect(_update_filters)
@@ -142,7 +144,7 @@ func _ready():
 	_script_filter_popup.set_config(_config)
 	_filter_popups.append(_script_filter_popup)
 
-	_resource_filter_popup = FilterMenuScene.instantiate()
+	_resource_filter_popup = FilterMenuScene.instantiate() as FilterMenu
 	add_child(_resource_filter_popup)
 	_resource_filter_popup.type = "resource"
 	_resource_filter_popup.filters_updated.connect(_update_filters)
@@ -163,7 +165,7 @@ func _ready():
 
 ##### PRIVATE METHODS #####
 
-func _init_config():
+func _init_config() -> void:
 	var err = _config.load("res://addons/godot_inheritance_dock/godot_inheritance_dock.cfg")
 	if err != OK:
 		print("WARNING: (res://addons/godot_inheritance_dock/inheritance_dock.gd::_init_config) godot_inheritance_dock.cfg failed to load!")
@@ -173,7 +175,7 @@ func _init_config():
 	else:
 		custom_minimum_size = Vector2(0, 50)
 
-func _init_files():
+func _init_files() -> void:
 	_scene_dict = Util.build_file_tree_dict(Util.SORT_SCENE_INHERITANCE)
 	_script_dict = Util.build_file_tree_dict(Util.SORT_SCRIPT_INHERITANCE)
 	_resource_dict = Util.build_file_tree_dict(Util.SORT_RES_INHERITANCE)
@@ -191,37 +193,37 @@ func _init_files():
 	_cache_flags |= CACHE_MAP[_mode]
 	_build_tree_from_tree_dict(tree, tree_dict)
 
-func _mode_to_name():
+func _mode_to_name() -> String:
 	match _mode:
 		Mode.SCRIPT_MODE: return "script"
 		Mode.RES_MODE: return "resource"
 		Mode.SCENE_MODE, _: return "scene"
 
-func _build_tree_from_tree_dict(p_tree, p_tree_dict):
+func _build_tree_from_tree_dict(p_tree: Tree, p_tree_dict: Dictionary) -> void:
 	if not p_tree or not p_tree_dict or not _ready_done:
-		return null
+		return
 
 	p_tree.clear()
 	p_tree.set_hide_root(true)
 	p_tree.set_select_mode(Tree.SELECT_SINGLE)
-	var root = p_tree.create_item()
+	var root := p_tree.create_item()
 
-	var file = p_tree_dict
-	var item = root
-	var file_list = [file]
-	var item_list = [item]
+	var file := p_tree_dict
+	var item := root
+	var file_list := [file]
+	var item_list := [item]
 
 	while not file_list.is_empty():
 		file = file_list.back()
 		item = item_list.back()
-		var count = len(file["children"])
+		var count := len(file["children"])
 
 		for a_filepath in file["children"]:
-			var child = file["children"][a_filepath]
-			var do_create = true
+			var child := file["children"][a_filepath] as Dictionary
+			var do_create := true
 
-			var link_data = a_filepath
-			var is_directory = a_filepath.find("/", a_filepath.length() - 1) != -1
+			var link_data: String = a_filepath
+			var is_directory: bool = a_filepath.find("/", a_filepath.length() - 1) != -1
 			if is_directory:
 				link_data = ("" if a_filepath == "res://" else "res://addons") + a_filepath
 
@@ -230,11 +232,11 @@ func _build_tree_from_tree_dict(p_tree, p_tree_dict):
 					do_create = false
 
 				if _class_filter and not is_directory:
-					var res = load(a_filepath)
-					var type = ""
+					var res := load(a_filepath)
+					var type := ""
 
 					if res is PackedScene:
-						var state = res.get_state()
+						var state := res.get_state() as SceneState
 						type = state.get_node_type(0)
 					elif res is Script:
 						type = res.get_instance_base_type()
@@ -251,7 +253,7 @@ func _build_tree_from_tree_dict(p_tree, p_tree_dict):
 							break
 
 			if do_create:
-				var new_item = p_tree.create_item(item)
+				var new_item := p_tree.create_item(item)
 				new_item.set_selectable(0, true)
 				new_item.set_editable(0, false)
 				if a_filepath in _collapsed_set:
@@ -272,7 +274,7 @@ func _build_tree_from_tree_dict(p_tree, p_tree_dict):
 				match _mode:
 					Mode.RES_MODE:
 						if not img:
-							var ext = a_filepath.get_extension()
+							var ext: String = a_filepath.get_extension()
 							if a_filepath.find(".", 0) == -1:
 								ext = ""
 							if not ext:
@@ -298,62 +300,62 @@ func _build_tree_from_tree_dict(p_tree, p_tree_dict):
 
 ##### CONNECTIONS #####
 
-func _on_scene_tab_button_pressed():
+func _on_scene_tab_button_pressed() -> void:
 	set_mode(Mode.SCENE_MODE)
 
-func _on_script_tab_button_pressed():
+func _on_script_tab_button_pressed() -> void:
 	set_mode(Mode.SCRIPT_MODE)
 
-func _on_resource_tab_button_pressed():
+func _on_resource_tab_button_pressed() -> void:
 	set_mode(Mode.RES_MODE)
 
-func _on_search_text_changed(p_text):
+func _on_search_text_changed(p_text: String) -> void:
 	set_search_filter(p_text)
 
-func _on_class_filter_edit_text_changed(p_text):
+func _on_class_filter_edit_text_changed(p_text: String) -> void:
 	set_class_filter(p_text)
 
-func _on_new_file_button_pressed():
+func _on_new_file_button_pressed() -> void:
 	if resource_tree and resource_tree.get_selected():
-		var path = resource_tree.get_selected().get_metadata(0)
-		var img = resource_tree.get_selected().get_icon(0)
+		var path: String = resource_tree.get_selected().get_metadata(0)
+		var img := resource_tree.get_selected().get_icon(0)
 		if img == BASETYPE_ICON or img == SCRIPT_ICON: # not a resource file
-			emit_signal("new_res_request", resource_tree.get_selected().get_metadata(0))
+			emit_signal("new_res_request", path)
 
-func _on_add_script_button_pressed():
+func _on_add_script_button_pressed() -> void:
 	if script_tree and script_tree.get_selected():
 		emit_signal("add_script_request", script_tree.get_selected().get_metadata(0))
 
-func _on_extend_button_pressed():
+func _on_extend_button_pressed() -> void:
 	if tree and tree.get_selected():
 		emit_signal("extend_"+_mode_to_name()+"_request", tree.get_selected().get_metadata(0))
 
-func _on_instance_button_pressed():
+func _on_instance_button_pressed() -> void:
 	if tree and tree.get_selected():
 		emit_signal("instance_"+_mode_to_name()+"_request", tree.get_selected().get_metadata(0))
 
-func _on_find_button_pressed():
+func _on_find_button_pressed() -> void:
 	if tree and tree.get_selected():
 		emit_signal("file_selected", tree.get_selected().get_metadata(0))
 
-func _on_file_selected(p_file):
+func _on_file_selected(p_file: String) -> void:
 	emit_signal("file_selected", p_file)
 
-func _on_filter_menu_button_pressed():
+func _on_filter_menu_button_pressed() -> void:
 	if not filter_popup:
 		return
 
 	filter_popup.visible = !filter_popup.visible
 	if filter_popup.visible:
-		var x = Vector2(get_tree().get_root().size.x, 0) / 2
-		var pos = filter_menu_button.get_global_position()
-		var side = 1 if pos > x else 0
+		var x := Vector2(get_tree().get_root().size.x, 0) / 2
+		var pos := filter_menu_button.get_global_position()
+		var side := 1 if pos > x else 0
 		filter_popup.set_position(filter_menu_button.get_screen_position() + Vector2(side * -400, 50))
 
-func _update_filters():
+func _update_filters() -> void:
 	_build_tree_from_tree_dict(tree, tree_dict)
 
-func _scan_files():
+func _scan_files() -> void:
 	if scene_tree:
 		scene_tree.clear()
 	if script_tree:
@@ -362,37 +364,37 @@ func _scan_files():
 		resource_tree.clear()
 	_init_files()
 
-func _on_item_collapsed(p_item):
+func _on_item_collapsed(p_item: TreeItem) -> void:
 	if not p_item.is_collapsed() and _collapsed_set.has(p_item.get_metadata(0)):
 		_collapsed_set.erase(p_item.get_metadata(0))
 	else:
 		_collapsed_set[p_item.get_metadata(0)] = null
 
-func _on_item_activated():
+func _on_item_activated() -> void:
 	if not tree:
 		print("WARNING: (res://addons/godot_inheritance_dock/inheritance_dock.gd::_on_item_activated) 'tree' is Nil!")
 		return
-	var item = tree.get_selected()
+	var item := tree.get_selected()
 	if item:
 		match _mode:
 			Mode.SCENE_MODE, Mode.SCRIPT_MODE:
 				emit_signal("edit_"+_mode_to_name()+"_request", item.get_metadata(0))
 			Mode.RES_MODE:
-				var meta = item.get_metadata(0)
-				var ext = meta.get_extension()
+				var meta: Variant = item.get_metadata(0)
+				var ext: Variant = meta.get_extension()
 				if ext:
 					var is_res = ext.find("res", 0) != -1
 					emit_signal("edit_"+ ("res" if is_res else "script") +"_request", meta)
 				elif meta.find(".", 0) == -1:
 					pass # TODO: It's an in-engine type. Open class API
 
-func _on_item_sync_requested(p_popup, p_item):
-	var filter_name = p_item.name_edit.text
-	var checked = p_item.check.button_pressed
-	var regex_text = p_item.regex_edit.text
+func _on_item_sync_requested(p_popup: FilterMenu, p_item: FilterMenuItem) -> void:
+	var filter_name := p_item.name_edit.text
+	var checked := p_item.check.button_pressed
+	var regex_text := p_item.regex_edit.text
 	for a_popup in _filter_popups:
 		if a_popup != p_popup:
-			var found = false
+			var found := false
 			for an_item in a_popup.filter_vbox.get_children():
 				if an_item.name_edit.text == filter_name:
 					an_item.regex_edit.text = regex_text
@@ -404,7 +406,7 @@ func _on_item_sync_requested(p_popup, p_item):
 
 ##### SETTERS AND GETTERS #####
 
-func set_mode(p_mode):
+func set_mode(p_mode: Mode) -> void:
 	_mode = p_mode
 	tab.current_tab = p_mode
 	if filter_popup:
@@ -457,10 +459,10 @@ func set_mode(p_mode):
 		_build_tree_from_tree_dict(tree, tree_dict)
 		_cache_flags |= CACHE_MAP[_mode]
 
-func set_search_filter(p_value):
+func set_search_filter(p_value: String) -> void:
 	_search_filter = p_value
 	_build_tree_from_tree_dict(tree, tree_dict)
 
-func set_class_filter(p_value):
+func set_class_filter(p_value: String) -> void:
 	_class_filter = p_value
 	_build_tree_from_tree_dict(tree, tree_dict)
