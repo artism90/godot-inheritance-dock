@@ -14,6 +14,7 @@ signal item_sync_requested(p_popup, p_item)
 ##### CONSTANTS #####
 
 const FilterMenuItemScene = preload("filter_menu_item.tscn")
+const FilterMenuItem = preload("filter_menu_item.gd")
 
 const CONFIG_PATH = "res://addons/godot_inheritance_dock/godot_inheritance_dock.cfg"
 
@@ -22,21 +23,21 @@ const CONFIG_PATH = "res://addons/godot_inheritance_dock/godot_inheritance_dock.
 ##### MEMBERS #####
 
 # public
-var filters = []: get = get_filters, set = set_filters
-var type = ""
+var filters := []: get = get_filters, set = set_filters
+var type := ""
 
 # public onready
-@onready var add_filter_button = $PanelContainer/VBoxContainer/HBoxContainer/AddFilterButton
-@onready var save_filters_button = $PanelContainer/VBoxContainer/HBoxContainer/SaveFiltersButton
-@onready var reload_filters_button = $PanelContainer/VBoxContainer/HBoxContainer/ReloadFiltersButton
-@onready var filter_vbox = $PanelContainer/VBoxContainer/FilterVbox
+@onready var add_filter_button := $PanelContainer/VBoxContainer/HBoxContainer/AddFilterButton as Button
+@onready var save_filters_button := $PanelContainer/VBoxContainer/HBoxContainer/SaveFiltersButton as Button
+@onready var reload_filters_button := $PanelContainer/VBoxContainer/HBoxContainer/ReloadFiltersButton as Button
+@onready var filter_vbox := $PanelContainer/VBoxContainer/FilterVbox as VBoxContainer
 
 # private
-var _config = null: set = set_config
+var _config: ConfigFile = null: set = set_config
 
 ##### NOTIFICATIONS #####
 
-func _ready():
+func _ready() -> void:
 	add_filter_button.pressed.connect(_on_add_filter_button_pressed)
 	save_filters_button.pressed.connect(_on_save_filters_button_pressed)
 	reload_filters_button.pressed.connect(_on_reload_filters_button_pressed)
@@ -49,8 +50,8 @@ func _ready():
 
 ##### PUBLIC METHODS #####
 
-func add_filter(p_name = "", p_regex_text = "", p_checked = false):
-	var item = FilterMenuItemScene.instantiate()
+func add_filter(p_name := "", p_regex_text := "", p_checked := false) -> void:
+	var item := FilterMenuItemScene.instantiate()
 	filter_vbox.add_child(item)
 	_setup_item(item, p_name, p_regex_text, p_checked)
 
@@ -58,7 +59,7 @@ func add_filter(p_name = "", p_regex_text = "", p_checked = false):
 
 # 1. on check pressed, emit "filters_updated"
 # 2. on regex text changed, update icon
-func _setup_item(p_item, p_name = "", p_regex_text = "", p_checked = false):
+func _setup_item(p_item: FilterMenuItem, p_name := "", p_regex_text := "", p_checked := false) -> void:
 	if not p_item:
 		return
 
@@ -71,16 +72,16 @@ func _setup_item(p_item, p_name = "", p_regex_text = "", p_checked = false):
 	p_item.regex_edit.text = p_regex_text
 	p_item.check.button_pressed = p_checked
 
-func _ui_dirtied():
+func _ui_dirtied() -> void:
 	if save_filters_button:
 		_set_save_disabled(false)
 
-func _update_filters():
+func _update_filters() -> void:
 	emit_signal("filters_updated")
 	_ui_dirtied()
 
-func _get_config_save_filters_dict():
-	var dict = {}
+func _get_config_save_filters_dict() -> Variant:
+	var dict := {}
 	if not filter_vbox:
 		return filters
 
@@ -93,7 +94,7 @@ func _get_config_save_filters_dict():
 		}
 	return dict
 
-func _set_save_disabled(p_disabled):
+func _set_save_disabled(p_disabled: bool) -> void:
 	save_filters_button.self_modulate = save_filters_button.disabled_color if p_disabled else save_filters_button.natural_color
 	save_filters_button.disabled = p_disabled
 
@@ -105,7 +106,7 @@ func _on_add_filter_button_pressed():
 	add_filter()
 	_update_filters()
 
-func _on_save_filters_button_pressed():
+func _on_save_filters_button_pressed() -> void:
 	if not _config:
 		return
 
@@ -113,26 +114,26 @@ func _on_save_filters_button_pressed():
 	_config.save(CONFIG_PATH)
 	_set_save_disabled(true)
 
-func _on_reload_filters_button_pressed():
+func _on_reload_filters_button_pressed() -> void:
 	if not _config:
 		print("WARNING: (res://addons/godot_inheritance_dock/filter_menu.gd::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference")
 		return
-		
-	var new_filters = _config.get_value("filters", type+"_filters")
+
+	var new_filters: Dictionary = _config.get_value("filters", type+"_filters")
 	set_filters(new_filters)
 	_set_save_disabled(true)
 
-func _on_item_sync_requested(p_item):
+func _on_item_sync_requested(p_item: FilterMenuItem) -> void:
 	emit_signal("item_sync_requested", self, p_item)
 
 ##### SETTERS AND GETTERS #####
 
-func set_config(p_config):
+func set_config(p_config: ConfigFile) -> void:
 	_config = p_config
 	if _config.has_section_key("filters", type+"_filters"):
 		set_filters(_config.get_value("filters", type+"_filters"))
 
-func set_filters(p_filters):
+func set_filters(p_filters: Variant) -> void:
 	if not filter_vbox:
 		return
 
@@ -140,15 +141,16 @@ func set_filters(p_filters):
 		a_child.queue_free()
 
 	for a_name in p_filters:
-		var regex_text = p_filters[a_name]["regex_text"]
-		var checked = p_filters[a_name]["on"]
+		var regex_text: String = p_filters[a_name]["regex_text"]
+		var checked: bool = p_filters[a_name]["on"]
 		add_filter(a_name, regex_text, checked)
 	_update_filters()
 
-func get_filters():
-	var filters = []
+func get_filters() -> Array:
+	var filters: Array[RegEx] = []
 	if not filter_vbox:
 		return filters
+
 	for an_item in filter_vbox.get_children():
 		if an_item.check.button_pressed and an_item.is_valid():
 			filters.append(an_item.get_regex())
