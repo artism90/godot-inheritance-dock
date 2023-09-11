@@ -165,9 +165,9 @@ func _ready() -> void:
 ##### PRIVATE METHODS #####
 
 func _init_config() -> void:
-	var err = _config.load("res://addons/godot_inheritance_dock/godot_inheritance_dock.cfg")
+	var err := _config.load((get_script().get_path().get_base_dir().path_join("godot_inheritance_dock.cfg")))
 	if err != OK:
-		print("WARNING: (res://addons/godot_inheritance_dock/inheritance_dock.gd::_init_config) godot_inheritance_dock.cfg failed to load!")
+		print("WARNING: ({0}::_init_config) godot_inheritance_dock.cfg failed to load!".format([get_script().get_path()]))
 	_config_loaded = true
 	if _config.has_section_key("window", "custom_minimum_size"):
 		custom_minimum_size = _config.get_value("window", "custom_minimum_size")
@@ -371,7 +371,7 @@ func _on_item_collapsed(p_item: TreeItem) -> void:
 
 func _on_item_activated() -> void:
 	if not tree:
-		print("WARNING: (res://addons/godot_inheritance_dock/inheritance_dock.gd::_on_item_activated) 'tree' is Nil!")
+		print("WARNING: ({0}::_on_item_activated) 'tree' is Nil!".format([get_script().get_path()]))
 		return
 	var item := tree.get_selected()
 	if item:

@@ -39,7 +39,8 @@ static func search_res(p_regex := "") -> Dictionary:
 		regex = RegEx.new()
 		regex.compile(p_regex)
 		if not regex.is_valid():
-			print("WARNING: (res://addons/godot_inheritance_dock/res_utility.gd::search_res) regex failed to compile: ", p_regex)
+			var script_path := preload("res_utility.gd").new().get_script().get_path() as String
+			print("WARNING: ({0}::search_res) regex failed to compile: {1}".format([script_path, p_regex]))
 			return {}
 
 	var dirs := ["res://"]
