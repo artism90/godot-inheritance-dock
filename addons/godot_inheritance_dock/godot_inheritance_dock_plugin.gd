@@ -14,22 +14,22 @@ extends EditorPlugin
 ##### MEMBERS #####
 
 # public
-var dock = null
+var dock: PanelContainer = null
 var selected = null
-var scene_file_dialog = EditorFileDialog.new()
-var res_file_dialog = EditorFileDialog.new()
+var scene_file_dialog := EditorFileDialog.new()
+var res_file_dialog := EditorFileDialog.new()
 
 # public onready
 
 # private
-var _scene_path = "" # for use in extending scenes
-var _res_script_path = "" # for use in assigning a script or type to generated .(t)res files
-var _undo_redo = null
+var _scene_path := "" # for use in extending scenes
+var _res_script_path := "" # for use in assigning a script or type to generated .(t)res files
+var _undo_redo: EditorUndoRedoManager = null
 
 ##### NOTIFICATIONS #####
 
-func _enter_tree():
-	dock = preload("inheritance_dock.tscn").instantiate()
+func _enter_tree() -> void:
+	dock = preload("inheritance_dock.tscn").instantiate() as PanelContainer
 	dock.set_name(dock.TITLE)
 	add_control_to_dock(DOCK_SLOT_RIGHT_UR, dock)
 
@@ -57,7 +57,7 @@ func _enter_tree():
 
 	_undo_redo = get_undo_redo()
 
-func _exit_tree():
+func _exit_tree() -> void:
 	scene_file_dialog.free()
 	res_file_dialog.free()
 	remove_control_from_docks(dock)
@@ -72,11 +72,11 @@ func _exit_tree():
 ##### PRIVATE METHODS #####
 
 # If this isn't call deferred, then you run into "File already exists, overwrite?" popups
-func _make_extended_scene():
-	var path = scene_file_dialog.get_current_file()
+func _make_extended_scene() -> void:
+	var path := scene_file_dialog.get_current_file()
 	if not path.begins_with("res://") and not path.begins_with("user://"):
 		path = "res://" + path
-	var f = FileAccess.open(path, FileAccess.WRITE_READ)
+	var f := FileAccess.open(path, FileAccess.WRITE_READ)
 	if f.get_error() != OK:
 		return
 
@@ -91,57 +91,57 @@ func _make_extended_scene():
 	f.close()
 	get_editor_interface().open_scene_from_path(path)
 
-func _make_res_file():
-	var path = res_file_dialog.get_current_file()
-	var f = FileAccess.open(path, FileAccess.WRITE_READ)
+func _make_res_file() -> void:
+	var path := res_file_dialog.get_current_file()
+	var f := FileAccess.open(path, FileAccess.WRITE_READ)
 	if f.get_error() != OK:
 		return
 
-	var script = null
-	var res_type = null
+	var script: Script = null
+	var res_type: Variant = null
 	if _res_script_path.find(".", 0) != -1:
-		script = load(_res_script_path)
+		script = load(_res_script_path) as Script
 		res_type = script.get_instance_base_type() if script else "Resource"
 	else:
 		script = null
 		res_type = _res_script_path
 	f.store_string("[gd_resource type=\""+res_type+"\" format=3]\n\n[resource]\n\n")
 	f.close()
-	var res = load(path)
+	var res := load(path)
 	res.set_script(script)
 	get_editor_interface().edit_resource(script)
 	get_editor_interface().edit_resource(res)
 
-func _is_asset(p_path):
+func _is_asset(p_path: String) -> bool:
 	return p_path.find(".", 0) != -1 and p_path[p_path.length() - 1] != "/"
 
 ##### CONNECTIONS #####
 
-func _on_add_script_request(p_script_path):
-	var nodes = get_editor_interface().get_selection().get_selected_nodes()
-	var script = load(p_script_path)
+func _on_add_script_request(p_script_path: String) -> void:
+	var nodes := get_editor_interface().get_selection().get_selected_nodes()
+	var script := load(p_script_path)
 	if not script or not ClassDB.can_instantiate(script.get_instance_base_type()):
 		return
 
 	_undo_redo.create_action("Add Script To Selected Nodes", UndoRedo.MERGE_ALL)
 	for a_node in nodes:
-		var a_script = a_node.get_script()
+		var a_script: Script = a_node.get_script()
 		_undo_redo.add_do_method(a_node, "set_script", script)
 		_undo_redo.add_undo_method(a_node, "set_script", a_script)
 	_undo_redo.commit_action()
 
-func _on_extend_script_request(p_script_path):
-	var script = load(p_script_path)
+func _on_extend_script_request(p_script_path: String) -> void:
+	var script := load(p_script_path)
 	if not script:
 		return
-
-	var base_path = "\""+p_script_path+"\""
-	var class_path = p_script_path.get_base_dir().path_join("new_class")
+		
+	var base_path := "\""+p_script_path+"\""
+	var class_path := p_script_path.get_base_dir().path_join("new_class")
 	get_editor_interface().get_script_editor().open_script_create_dialog(base_path, class_path)
 
-func _on_instance_script_request(p_script_path):
-	var nodes = get_editor_interface().get_selection().get_selected_nodes()
-	var script = load(p_script_path)
+func _on_instance_script_request(p_script_path: String) -> void:
+	var nodes := get_editor_interface().get_selection().get_selected_nodes()
+	var script := load(p_script_path)
 	if not script or not ClassDB.can_instantiate(script.get_instance_base_type()):
 		return
 
@@ -152,34 +152,34 @@ func _on_instance_script_request(p_script_path):
 		_undo_redo.add_do_method(get_editor_interface().get_selection(), "clear")
 
 	for a_node in nodes:
-		var new_node = script.new()
+		var new_node := script.new() as Script
 		_undo_redo.add_do_method(a_node, "add_child", new_node)
 		_undo_redo.add_do_method(new_node, "set_owner", get_editor_interface().get_edited_scene_root())
 		_undo_redo.add_do_method(get_editor_interface().get_selection(), "add_node", new_node)
 		_undo_redo.add_undo_method(new_node, "queue_free")
 	_undo_redo.commit_action()
 
-func _on_edit_script_request(p_script_path):
+func _on_edit_script_request(p_script_path: String) -> void:
 	if not _is_asset(p_script_path):
 		return
 
-	var script = load(p_script_path)
+	var script := load(p_script_path)
 	get_editor_interface().edit_resource(script)
 
-func _on_extend_scene_request(p_scene_path):
+func _on_extend_scene_request(p_scene_path: String) -> void:
 	_scene_path = p_scene_path # make the path quickly accessible to connected functions
 	scene_file_dialog.popup_centered_ratio()
 
-func _on_instance_scene_request(p_scene_path):
+func _on_instance_scene_request(p_scene_path: String) -> void:
 	if get_editor_interface().get_edited_scene_root().get_scene_file_path() == p_scene_path:
-		var err_dialog = AcceptDialog.new()
+		var err_dialog := AcceptDialog.new()
 		get_editor_interface().get_base_control().add_child(err_dialog)
 		err_dialog.get_label().text = "You cannot instance a scene within itself!"
 		err_dialog.popup_centered_clamped()
 		return
 
-	var nodes = get_editor_interface().get_selection().get_selected_nodes()
-	var scene = load(p_scene_path)
+	var nodes := get_editor_interface().get_selection().get_selected_nodes()
+	var scene := load(p_scene_path)
 	if not scene:
 		return
 
@@ -197,30 +197,30 @@ func _on_instance_scene_request(p_scene_path):
 		_undo_redo.add_undo_method(new_node, "queue_free")
 	_undo_redo.commit_action()
 
-func _on_edit_scene_request(p_scene_path):
+func _on_edit_scene_request(p_scene_path: String) -> void:
 	if not _is_asset(p_scene_path):
 		return
 
 	get_editor_interface().open_scene_from_path(p_scene_path)
 
-func _on_save_scene_pressed():
+func _on_save_scene_pressed() -> void:
 	call_deferred("_make_extended_scene")
 
-func _on_res_file_pressed():
+func _on_res_file_pressed() -> void:
 	call_deferred("_make_res_file")
 
-func _on_new_res_request(p_script_path):
+func _on_new_res_request(p_script_path: String) -> void:
 	_res_script_path = p_script_path # make the path quickly accessible to connection functions
 	res_file_dialog.popup_centered_ratio()
 
-func _on_edit_res_request(p_res_path):
+func _on_edit_res_request(p_res_path: String) -> void:
 	if not _is_asset(p_res_path):
 		return
 
-	var res = load(p_res_path)
+	var res := load(p_res_path)
 	get_editor_interface().edit_resource(res)
 
-func _on_file_selected(p_file):
+func _on_file_selected(p_file: String) -> void:
 	get_editor_interface().select_file(p_file)
 
 ##### SETTERS AND GETTERS #####
