@@ -60,6 +60,10 @@ func _enter_tree() -> void:
 
 	_undo_redo = get_undo_redo()
 
+func _enable_plugin() -> void:
+	# Initial file tree creation, later through filesystem_changed signal
+	dock._scan_files()
+
 func _exit_tree() -> void:
 	scene_file_dialog.free()
 	res_file_dialog.free()
@@ -137,7 +141,7 @@ func _on_extend_script_request(p_script_path: String) -> void:
 	var script := load(p_script_path)
 	if not script:
 		return
-		
+
 	var base_path := "\""+p_script_path+"\""
 	var class_path := p_script_path.get_base_dir().path_join("new_class")
 	get_editor_interface().get_script_editor().open_script_create_dialog(base_path, class_path)
