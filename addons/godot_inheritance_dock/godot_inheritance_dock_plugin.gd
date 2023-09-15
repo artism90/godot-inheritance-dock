@@ -228,6 +228,18 @@ func _on_edit_res_request(p_res_path: String) -> void:
 	get_editor_interface().edit_resource(res)
 
 func _on_file_selected(p_file: String) -> void:
+	# This will only select the file.
+	# Hidden FileSystemDock has to be opened explicitly.
 	get_editor_interface().select_file(p_file)
+
+	# Inheritance dock will leak into FileSystemDock if both share the same
+	# panel and inheritance dock is not explicitly hidden.
+	dock.hide()
+	get_editor_interface().get_file_system_dock().show()
+
+	# FIXME
+	# Currently, panel tab won't update when panel itself changes to
+	# FileSystemDock. As of 4.2, it appears to be no mechanism available for
+	# switching docks. Verify future versions for a solution.
 
 ##### SETTERS AND GETTERS #####
