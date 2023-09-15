@@ -76,6 +76,14 @@ func _setup_item(p_item: FilterMenuItem, p_name := "", p_regex_text := "", p_che
 	p_item.item_removed.connect(_ui_dirtied)
 	p_item.item_sync_requested.connect(_on_item_sync_requested)
 	p_item.name_edit.text = p_name
+	# -------------------------------------------------------------------------
+	# FIXME: LineEdit misses text_set signal (currently only in TextEdit implemented)
+	#        in order to allow setter to invoke _on_regex_edit_text_changed
+	#        method for initial regex compilation.
+	#        Delete this band-aid block once the issue is resolved.
+	p_item._regex.compile(p_regex_text)
+	p_item._update_regex_valid()
+	# -------------------------------------------------------------------------
 	p_item.regex_edit.text = p_regex_text
 	p_item.check.button_pressed = p_checked
 
