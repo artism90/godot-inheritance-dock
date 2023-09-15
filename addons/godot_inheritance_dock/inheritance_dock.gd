@@ -414,7 +414,7 @@ func _on_item_sync_requested(p_popup: FilterMenu, p_item: FilterMenuItem) -> voi
 					found = true
 					break
 			if not found:
-				filter_popup.add_filter(filter_name, regex_text, checked)
+				a_popup.add_filter(filter_name, regex_text, checked)
 
 ##### SETTERS AND GETTERS #####
 
