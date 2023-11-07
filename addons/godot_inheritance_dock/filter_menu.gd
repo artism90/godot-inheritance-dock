@@ -47,6 +47,7 @@ func _ready() -> void:
 	add_filter_button.pressed.connect(_on_add_filter_button_pressed)
 	save_filters_button.pressed.connect(_on_save_filters_button_pressed)
 	reload_filters_button.pressed.connect(_on_reload_filters_button_pressed)
+	#filters_reloaded.connect(_on_post_reload_filters_button_pressed)
 	reload_filters_button.disabled = false
 	call_deferred("_set_save_disabled", true)
 
@@ -101,11 +102,13 @@ func _move_filter(p_item: FilterMenuItem, p_direction: FilterMenuItem.ButtonEven
 	_ui_dirtied()
 
 func _ui_dirtied() -> void:
+	prints("_ui_dirtied()")
 	size.y = min_size.y
 	if save_filters_button:
 		_set_save_disabled(false)
 
 func _update_filters() -> void:
+	prints("_update_filters()")
 	emit_signal("filters_updated")
 	_ui_dirtied()
 
@@ -159,6 +162,12 @@ func _on_reload_filters_button_pressed() -> void:
 	set_filters(new_filters)
 	_set_save_disabled(true)
 
+	#emit_signal("filters_reloaded")
+
+#func _on_post_reload_filters_button_pressed() -> void:
+	#prints("_on_post_reload_filters_button_pressed")
+	#size.y = min_size.y
+
 func _on_item_removed(p_item: FilterMenuItem) -> void:
 	_ui_dirtied()
 
@@ -168,6 +177,7 @@ func _on_item_sync_requested(p_item: FilterMenuItem) -> void:
 ##### SETTERS AND GETTERS #####
 
 func set_config(p_config: ConfigFile) -> void:
+	prints("set_config:", p_config, "for", type)
 	_config = p_config
 	if _config.has_section_key("filters", type+"_filters"):
 		# TODO: Refactor.
@@ -178,6 +188,7 @@ func set_config(p_config: ConfigFile) -> void:
 		set_filters(new_filters)
 
 func set_filters(p_filters: Variant) -> void:
+	prints(type, "set_filters:", p_filters)
 	if not filter_vbox:
 		return
 
@@ -185,9 +196,11 @@ func set_filters(p_filters: Variant) -> void:
 		a_child.free()
 
 	for a_name in p_filters:
+		prints("add", a_name)
 		var regex_text: String = p_filters[a_name]["regex_text"]
 		var checked: bool = p_filters[a_name]["on"]
 		add_filter(a_name, regex_text, checked)
+		prints("------------")
 	_update_filters()
 
 func get_filters() -> Array:
@@ -198,4 +211,7 @@ func get_filters() -> Array:
 	for an_item in filter_vbox.get_children():
 		if an_item.check.button_pressed and an_item.is_valid():
 			filters.append(an_item.get_regex())
+			#prints(an_item.get_regex().get_pattern())
+	#if not filters.is_empty(): # DEBUG
+	#	push_warning("type: ", type, " get_filters: ", filters)
 	return filters

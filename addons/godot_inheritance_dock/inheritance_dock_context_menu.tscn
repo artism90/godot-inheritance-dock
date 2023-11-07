@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3 uid="uid://v148u8xcvjud"]
+
+[ext_resource type="Script" path="res://addons/godot_inheritance_dock/inheritance_dock_context_menu.gd" id="1_dac6w"]
+
+[node name="InheritanceDockContextMenu" type="PopupMenu"]
+size = Vector2i(229, 460)
+visible = true
+item_count = 21
+item_0/text = "Open Scene"
+item_0/id = 0
+item_1/text = "New Inherited Scene"
+item_1/id = 1
+item_2/text = "Set As Main Scene"
+item_2/id = 2
+item_3/text = "Instantiate"
+item_3/id = 3
+item_4/text = ""
+item_4/id = 4
+item_4/separator = true
+item_5/text = "Edit Dependencies..."
+item_5/id = 5
+item_6/text = "View Owners..."
+item_6/id = 6
+item_7/text = ""
+item_7/id = 7
+item_7/separator = true
+item_8/text = "Create New"
+item_8/id = 8
+item_9/text = ""
+item_9/id = 9
+item_9/separator = true
+item_10/text = "Copy Path"
+item_10/id = 10
+item_11/text = "Copy UID"
+item_11/id = 11
+item_12/text = "Rename..."
+item_12/id = 12
+item_13/text = "Duplicate..."
+item_13/id = 13
+item_14/text = "Move/Duplicate To..."
+item_14/id = 14
+item_15/text = "Delete"
+item_15/id = 15
+item_16/text = ""
+item_16/id = 16
+item_16/separator = true
+item_17/text = "Add to Favorites"
+item_17/id = 17
+item_18/text = ""
+item_18/id = 18
+item_18/separator = true
+item_19/text = "Show in File Manager"
+item_19/id = 19
+item_20/text = "Open in External Program"
+item_20/id = 20
+script = ExtResource("1_dac6w")

@@ -17,6 +17,9 @@ signal new_res_request(p_script_path: String)
 signal edit_res_request(p_res_path: String)
 signal file_selected(p_file: String)
 
+# DEBUG
+signal rename_file_request(p_script_path: String)
+
 ##### CLASSES #####
 
 ##### CONSTANTS #####
@@ -100,6 +103,8 @@ var _class_filter := "": set = set_class_filter
 var _ready_done := false
 var _cache_flags := Caches.CACHE_NONE
 
+var _popup_menu: PopupMenu
+
 ##### NOTIFICATIONS #####
 
 func _init() -> void:
@@ -123,9 +128,15 @@ func _ready() -> void:
 	find_button.pressed.connect(_on_find_button_pressed)
 	filter_menu_button.pressed.connect(_on_filter_menu_button_pressed)
 	class_filter_edit.text_changed.connect(_on_class_filter_edit_text_changed)
+
+	scene_tree.button_clicked.connect(_on_button_clicked)
+	script_tree.button_clicked.connect(_on_button_clicked)
+	resource_tree.button_clicked.connect(_on_button_clicked)
+
 	scene_tree.item_collapsed.connect(_on_item_collapsed)
 	script_tree.item_collapsed.connect(_on_item_collapsed)
 	resource_tree.item_collapsed.connect(_on_item_collapsed)
+	scene_tree.item_mouse_selected.connect(_on_item_mouse_selected)
 	scene_tree.item_activated.connect(_on_item_activated)
 	script_tree.item_activated.connect(_on_item_activated)
 	resource_tree.item_activated.connect(_on_item_activated)
@@ -154,6 +165,10 @@ func _ready() -> void:
 	_resource_filter_popup.item_sync_requested.connect(_on_item_sync_requested)
 	_resource_filter_popup.set_config(_config)
 	_filter_popups.append(_resource_filter_popup)
+
+	_popup_menu = preload("inheritance_dock_context_menu.tscn").instantiate()
+	add_child(_popup_menu)
+	_popup_menu.index_pressed.connect(_on_index_pressed)
 
 	# UI Initialization
 	scene_tab_button.text = PluginTranslation.localize("KEY_SCENES")
@@ -213,6 +228,7 @@ func _mode_to_name() -> String:
 		Mode.SCENE_MODE, _: return "scene"
 
 func _build_tree_from_tree_dict(p_tree: Tree, p_tree_dict: Dictionary) -> void:
+	#prints("_build_tree_from_tree_dict")
 	if not p_tree or not p_tree_dict or not _ready_done:
 		return
 
@@ -329,6 +345,7 @@ func _on_class_filter_edit_text_changed(p_text: String) -> void:
 	set_class_filter(p_text)
 
 func _on_new_file_button_pressed() -> void:
+	prints("_on_new_file_button_pressed()")
 	if resource_tree and resource_tree.get_selected():
 		var path: String = resource_tree.get_selected().get_metadata(0)
 		var img := resource_tree.get_selected().get_icon(0)
@@ -352,6 +369,7 @@ func _on_find_button_pressed() -> void:
 		emit_signal("file_selected", tree.get_selected().get_metadata(0))
 
 func _on_file_selected(p_file: String) -> void:
+	prints("file_selected:", p_file)
 	emit_signal("file_selected", p_file)
 
 func _on_filter_menu_button_pressed() -> void:
@@ -369,6 +387,7 @@ func _update_filters() -> void:
 	_build_tree_from_tree_dict(tree, tree_dict)
 
 func _scan_files() -> void:
+	prints("_scan_files")
 	if scene_tree:
 		scene_tree.clear()
 	if script_tree:
@@ -377,11 +396,43 @@ func _scan_files() -> void:
 		resource_tree.clear()
 	_init_files()
 
+func _on_button_clicked(item: TreeItem, column: int, id: int, mouse_button_index: int):
+	prints("_on_button_clicked:", item, column, id, mouse_button_index)
+
 func _on_item_collapsed(p_item: TreeItem) -> void:
+	prints("collapsed")
 	if not p_item.is_collapsed() and _collapsed_set.has(p_item.get_metadata(0)):
 		_collapsed_set.erase(p_item.get_metadata(0))
 	else:
 		_collapsed_set[p_item.get_metadata(0)] = null
+
+func _on_item_mouse_selected(p_position: Vector2, p_mouse_button_index: int) -> void:
+	if p_mouse_button_index != MOUSE_BUTTON_RIGHT:
+		return
+
+	var file_system_dock := EditorInterface.get_file_system_dock()
+	var dock_slot := file_system_dock
+
+	#prints(scene_tree.get_selected().get_index())
+	#var i := 0
+	#for child in get_children():
+		#if child is PopupPanel:
+			#if i <= 0:
+				#i += 1
+				#continue
+			#prints(child.name)
+			#child.show()
+			#break
+
+	_popup_menu.position = get_screen_position() + get_local_mouse_position()
+	_popup_menu.reset_size()
+	_popup_menu.popup()
+
+func _on_index_pressed(index: int):
+	prints("index pressed:", index)
+	if index == 12:
+		prints("rename item")
+		emit_signal("rename_file_request", scene_tree.get_selected().get_metadata(0))
 
 func _on_item_activated() -> void:
 	if not tree:
@@ -402,13 +453,16 @@ func _on_item_activated() -> void:
 					pass # TODO: It's an in-engine type. Open class API
 
 func _on_item_sync_requested(p_popup: FilterMenu, p_item: FilterMenuItem) -> void:
+	prints(p_popup.type, p_item.name_edit.text)
 	var filter_name := p_item.name_edit.text
 	var checked := p_item.check.button_pressed
 	var regex_text := p_item.regex_edit.text
 	for a_popup in _filter_popups:
 		if a_popup != p_popup:
+			prints("p_popup:", p_popup.type, " ->", "a_popup:", a_popup.type)
 			var found := false
 			for an_item in a_popup.filter_vbox.get_children():
+				prints("\tan_item:", an_item.name_edit.text)
 				if an_item.name_edit.text == filter_name:
 					# ---------------------------------------------------------
 					# LineEdit misses text_set signal (currently only in
@@ -424,6 +478,7 @@ func _on_item_sync_requested(p_popup: FilterMenu, p_item: FilterMenuItem) -> voi
 					an_item.check.button_pressed = checked
 					found = true
 					break
+			prints("add filter_popup to:", filter_popup.type)
 			if not found:
 				a_popup.add_filter(filter_name, regex_text, checked)
 

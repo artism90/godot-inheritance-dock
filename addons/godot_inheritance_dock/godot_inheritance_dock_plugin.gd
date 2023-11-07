@@ -56,6 +56,9 @@ func _enter_tree() -> void:
 	dock.edit_res_request.connect(_on_edit_res_request)
 	dock.file_selected.connect(_on_file_selected)
 
+	# DEBUG
+	dock.rename_file_request.connect(_on_rename_file_request)
+
 	get_editor_interface().get_resource_filesystem().filesystem_changed.connect(dock._scan_files)
 
 	get_editor_interface().get_base_control().add_child(scene_file_dialog)
@@ -70,11 +73,17 @@ func _enter_tree() -> void:
 
 	_undo_redo = get_undo_redo()
 
+func _on_rename_file_request(p_script_path: String) -> void:
+	prints("requesting:", p_script_path)
+	#get_editor_interface().edit_resource(load(p_script_path))
+	get_editor_interface().inspect_object(load(p_script_path), "resource_path")
+
 func _enable_plugin() -> void:
 	# Initial file tree creation, later through filesystem_changed signal
 	get_editor_interface().get_resource_filesystem().scan()
 
 func _exit_tree() -> void:
+	prints("plugin::_exit_tree")
 	scene_file_dialog.free()
 	res_file_dialog.free()
 	remove_control_from_docks(dock)
@@ -230,6 +239,7 @@ func _on_edit_scene_request(p_scene_path: String) -> void:
 	get_editor_interface().open_scene_from_path(p_scene_path)
 
 func _on_save_scene_pressed(p_path: String = "") -> void:
+	prints("_on_save_scene_pressed()")
 	_make_extended_scene()
 
 func _on_res_file_pressed() -> void:
