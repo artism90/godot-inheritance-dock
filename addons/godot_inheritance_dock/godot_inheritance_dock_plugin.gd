@@ -76,6 +76,10 @@ func _exit_tree() -> void:
 
 ##### PUBLIC METHODS #####
 
+static func is_part_of_edited_scene(node: Node) -> bool:
+	return Engine.is_editor_hint() and node.is_inside_tree() and node.get_tree().get_edited_scene_root() and \
+			(node.get_tree().get_edited_scene_root() == node or node.get_tree().get_edited_scene_root().is_ancestor_of(node))
+
 ##### PRIVATE METHODS #####
 
 # If this isn't call deferred, then you run into "File already exists, overwrite?" popups

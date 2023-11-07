@@ -107,7 +107,7 @@ func _init() -> void:
 		emit_signal("load_failed")
 
 func _ready() -> void:
-	if not _config_loaded:
+	if preload("godot_inheritance_dock_plugin.gd").is_part_of_edited_scene(self) or not _config_loaded:
 		return
 
 	# Connections

@@ -40,6 +40,9 @@ var _config: ConfigFile: set = set_config
 ##### NOTIFICATIONS #####
 
 func _ready() -> void:
+	if preload("godot_inheritance_dock_plugin.gd").is_part_of_edited_scene(self):
+		return
+
 	add_filter_button.pressed.connect(_on_add_filter_button_pressed)
 	save_filters_button.pressed.connect(_on_save_filters_button_pressed)
 	reload_filters_button.pressed.connect(_on_reload_filters_button_pressed)

@@ -45,6 +45,9 @@ var _regex := RegEx.new(): get = get_regex
 ##### NOTIFICATIONS #####
 
 func _ready() -> void:
+	if preload("godot_inheritance_dock_plugin.gd").is_part_of_edited_scene(self):
+		return
+
 	check.toggled.connect(_on_check_toggled)
 	name_edit.text_changed.connect(_on_name_edit_text_changed)
 	regex_edit.text_changed.connect(_on_regex_edit_text_changed)
