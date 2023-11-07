@@ -3,9 +3,9 @@ extends RefCounted
 
 ## A collection of shared static functions for the plugin's nodes.
 
-##### CLASSES #####
-
 ##### SIGNALS #####
+
+##### CLASSES #####
 
 ##### CONSTANTS #####
 

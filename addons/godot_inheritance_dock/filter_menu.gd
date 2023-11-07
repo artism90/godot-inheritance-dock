@@ -7,7 +7,8 @@ extends PopupPanel
 ##### SIGNALS #####
 
 signal filters_updated
-signal item_sync_requested(p_popup: PopupPanel, p_item: FilterMenuItem)
+signal filters_reloaded
+signal item_sync_requested(p_popup: Panel, p_item: FilterMenuItem)
 
 ##### CLASSES #####
 
@@ -73,24 +74,34 @@ func _setup_item(p_item: FilterMenuItem, p_name := "", p_regex_text := "", p_che
 	if not p_item:
 		return
 
-	p_item.checkbox_updated.connect(_update_filters)
-	p_item.regex_updated.connect(_update_filters)
-	p_item.name_updated.connect(_ui_dirtied)
-	p_item.item_removed.connect(_ui_dirtied)
-	p_item.item_sync_requested.connect(_on_item_sync_requested)
 	p_item.name_edit.text = p_name
 	# -------------------------------------------------------------------------
-	# FIXME: LineEdit misses text_set signal (currently only in TextEdit implemented)
-	#        in order to allow setter to invoke _on_regex_edit_text_changed
-	#        method for initial regex compilation.
-	#        Delete this band-aid block once the issue is resolved.
+	# LineEdit misses text_set signal (currently only in TextEdit implemented)
+	# in order to allow setter to invoke _on_regex_edit_text_changed
+	# method for initial regex compilation.
+	# Keep this band-aid block to remain compatibility throughout all
+	# Godot 4 releases.
 	p_item._regex.compile(p_regex_text)
 	p_item._update_regex_valid()
 	# -------------------------------------------------------------------------
 	p_item.regex_edit.text = p_regex_text
 	p_item.check.button_pressed = p_checked
 
+	# Initial setup shouldn't trigger any callbacks, hence establish them
+	# only after the preparation is done and the user can interact with it.
+	p_item.checkbox_updated.connect(_update_filters)
+	p_item.filter_rearranged.connect(_move_filter)
+	p_item.regex_updated.connect(_update_filters)
+	p_item.name_updated.connect(_ui_dirtied)
+	p_item.item_removed.connect(_on_item_removed)
+	p_item.item_sync_requested.connect(_on_item_sync_requested)
+
+func _move_filter(p_item: FilterMenuItem, p_direction: FilterMenuItem.ButtonEvent) -> void:
+	filter_vbox.move_child(p_item, p_item.get_index() + p_direction)
+	_ui_dirtied()
+
 func _ui_dirtied() -> void:
+	size.y = min_size.y
 	if save_filters_button:
 		_set_save_disabled(false)
 
@@ -148,6 +159,9 @@ func _on_reload_filters_button_pressed() -> void:
 	set_filters(new_filters)
 	_set_save_disabled(true)
 
+func _on_item_removed(p_item: FilterMenuItem) -> void:
+	_ui_dirtied()
+
 func _on_item_sync_requested(p_item: FilterMenuItem) -> void:
 	emit_signal("item_sync_requested", self, p_item)
 
@@ -168,7 +182,7 @@ func set_filters(p_filters: Variant) -> void:
 		return
 
 	for a_child in filter_vbox.get_children():
-		a_child.queue_free()
+		a_child.free()
 
 	for a_name in p_filters:
 		var regex_text: String = p_filters[a_name]["regex_text"]

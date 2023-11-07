@@ -3,17 +3,23 @@ extends HBoxContainer
 
 ## Contains one RegEx rule inside a [code]FilterMenu[/code].
 
-##### CLASSES #####
-
 ##### SIGNALS #####
 
 signal checkbox_updated
+signal filter_rearranged(p_item: FilterMenuItem, p_direction: ButtonEvent)
 signal name_updated
 signal regex_updated
-signal item_removed
+signal item_removed(p_item: FilterMenuItem)
 signal item_sync_requested(p_item: FilterMenuItem)
 
+##### CLASSES #####
+
 ##### CONSTANTS #####
+
+enum ButtonEvent {
+	BUTTON_MOVE_UP = -1,
+	BUTTON_MOVE_DOWN = 1,
+}
 
 const REGEX_OK = preload("icons/icon_import_check.svg")
 const REGEX_ERROR = preload("icons/icon_error_sign.svg")
@@ -33,6 +39,8 @@ const PluginTranslation = preload("plugin_translation.gd")
 
 # public onready
 @onready var check := $CheckBox as CheckBox
+@onready var move_up_button := $MoveUpButton as Button
+@onready var move_down_button := $MoveDownButton as Button
 @onready var name_edit := $NameEdit as LineEdit
 @onready var regex_edit := $RegExEdit as LineEdit
 @onready var sync_button := $SyncButton as Button
@@ -49,6 +57,8 @@ func _ready() -> void:
 		return
 
 	check.toggled.connect(_on_check_toggled)
+	move_up_button.pressed.connect(_on_move_up_button)
+	move_down_button.pressed.connect(_on_move_down_button)
 	name_edit.text_changed.connect(_on_name_edit_text_changed)
 	regex_edit.text_changed.connect(_on_regex_edit_text_changed)
 	sync_button.pressed.connect(_on_sync_button_pressed)
@@ -77,6 +87,12 @@ func _update_regex_valid() -> void:
 func _on_check_toggled(p_toggle: bool) -> void:
 	emit_signal("checkbox_updated")
 
+func _on_move_up_button() -> void:
+	emit_signal("filter_rearranged", self, ButtonEvent.BUTTON_MOVE_UP)
+
+func _on_move_down_button() -> void:
+	emit_signal("filter_rearranged", self, ButtonEvent.BUTTON_MOVE_DOWN)
+
 func _on_name_edit_text_changed(p_text: String) -> void:
 	emit_signal("name_updated")
 
@@ -89,8 +105,12 @@ func _on_sync_button_pressed() -> void:
 	emit_signal("item_sync_requested", self)
 
 func _on_remove_button_pressed() -> void:
-	emit_signal("item_removed")
+	# Needed to reflect correct children number in filter menu
+	# because queue_free() will free it too late.
+	hide()
+
 	queue_free()
+	emit_signal("item_removed", self)
 
 ##### SETTERS AND GETTERS #####
 

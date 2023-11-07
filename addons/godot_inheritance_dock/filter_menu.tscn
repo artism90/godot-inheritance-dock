@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://bmbb8ytsmcb7i"]
+[gd_scene load_steps=10 format=3 uid="uid://bmbb8ytsmcb7i"]
 
 [ext_resource type="Script" path="res://addons/godot_inheritance_dock/filter_menu.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://dwgreq5a2gsxw" path="res://addons/godot_inheritance_dock/icons/icon_add.svg" id="2"]
 [ext_resource type="Script" path="res://addons/godot_inheritance_dock/color_controlled_button.gd" id="3"]
 [ext_resource type="Texture2D" uid="uid://cpfwsncjgm582" path="res://addons/godot_inheritance_dock/icons/icon_reload_small.svg" id="4"]
 [ext_resource type="Texture2D" uid="uid://btnq84t24rv1w" path="res://addons/godot_inheritance_dock/icons/icon_save.svg" id="5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lh3ir"]
 
 [sub_resource type="CanvasItemMaterial" id="1"]
 
@@ -13,15 +15,16 @@
 [sub_resource type="CanvasItemMaterial" id="3"]
 
 [node name="PopupPanel" type="PopupPanel"]
-size = Vector2i(152, 100)
+gui_embed_subwindows = true
+size = Vector2i(450, 200)
 visible = true
 script = ExtResource("1")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 offset_left = 4.0
 offset_top = 4.0
-offset_right = 148.0
-offset_bottom = 96.0
+offset_right = 446.0
+offset_bottom = 196.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
@@ -30,42 +33,40 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = 3
+
+[node name="VSeparator" type="VSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 32
+theme_override_styles/separator = SubResource("StyleBoxEmpty_lh3ir")
 
 [node name="AddFilterButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 material = SubResource("1")
-custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 tooltip_text = "Add a new filter to the end of the filter list.
 It may move due to Dictionary sorting (alphabetic by name)."
 icon = ExtResource("2")
-flat = true
 script = ExtResource("3")
 pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="ReloadFiltersButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 material = SubResource("2")
 layout_mode = 2
 size_flags_vertical = 3
 tooltip_text = "Reload the filter list from the config file."
 icon = ExtResource("4")
-flat = true
 script = ExtResource("3")
 pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="SaveFiltersButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
-self_modulate = Color(0.5, 0.5, 0.5, 1)
 material = SubResource("3")
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 tooltip_text = "Save the current filter list to the config file."
 disabled = true
 icon = ExtResource("5")
-flat = true
 script = ExtResource("3")
 pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
@@ -73,6 +74,7 @@ use_material_pressed = false
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
 text = "Filter List"
 
 [node name="FilterVbox" type="VBoxContainer" parent="PanelContainer/VBoxContainer"]
