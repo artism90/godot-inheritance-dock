@@ -39,48 +39,36 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="Scenes" type="Button" parent="VBoxContainer/TypeContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-toggle_mode = true
-button_pressed = true
 text = "Scenes"
 flat = true
 script = ExtResource("3")
-pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="VSeparator" type="VSeparator" parent="VBoxContainer/TypeContainer"]
 layout_mode = 2
 
 [node name="Scripts" type="Button" parent="VBoxContainer/TypeContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-toggle_mode = true
-button_pressed = true
 text = "Scripts"
 flat = true
 script = ExtResource("3")
-pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="VSeparator2" type="VSeparator" parent="VBoxContainer/TypeContainer"]
 layout_mode = 2
 
 [node name="Resources" type="Button" parent="VBoxContainer/TypeContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-toggle_mode = true
-button_pressed = true
 text = "Resources"
 flat = true
 script = ExtResource("3")
-pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="SearchContainer" type="HBoxContainer" parent="VBoxContainer"]
@@ -94,9 +82,10 @@ size_flags_horizontal = 3
 placeholder_text = "filter scenes"
 
 [node name="TextureRect" type="TextureRect" parent="VBoxContainer/SearchContainer"]
+custom_minimum_size = Vector2(22, 0)
 layout_mode = 2
 texture = ExtResource("4")
-stretch_mode = 4
+stretch_mode = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
@@ -106,7 +95,7 @@ theme_override_constants/separation = 0
 [node name="ToolContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 tooltip_text = "Adds the selected script to the Scene dock's selected node."
-theme_override_constants/separation = -6
+theme_override_constants/separation = -5
 
 [node name="NewFileButton" type="Button" parent="VBoxContainer/HBoxContainer/ToolContainer"]
 self_modulate = Color(0.5, 0.5, 0.5, 1)
@@ -151,7 +140,6 @@ pressed_color = Color(0.329412, 0.717647, 0.905882, 1)
 use_material_pressed = false
 
 [node name="FindButton" type="Button" parent="VBoxContainer/HBoxContainer/ToolContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 material = SubResource("4")
 layout_mode = 2
 tooltip_text = "Reveal this resource in the FileSystem dock."
@@ -163,15 +151,12 @@ use_material_pressed = false
 
 [node name="VSeparator2" type="VSeparator" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 0
 
 [node name="FilterContainer" type="HBoxContainer" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = -3
 
 [node name="FilterMenuButton" type="Button" parent="VBoxContainer/HBoxContainer/FilterContainer"]
-self_modulate = Color(0.329412, 0.717647, 0.905882, 1)
 material = SubResource("5")
 layout_mode = 2
 icon = ExtResource("10")
@@ -195,11 +180,17 @@ tabs_visible = false
 
 [node name="Scenes" type="Tree" parent="VBoxContainer/TabContainer"]
 layout_mode = 2
+allow_reselect = true
+allow_rmb_select = true
 
 [node name="Scripts" type="Tree" parent="VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
+allow_reselect = true
+allow_rmb_select = true
 
 [node name="Resources" type="Tree" parent="VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
+allow_reselect = true
+allow_rmb_select = true

@@ -10,6 +10,8 @@ extends BaseButton
 var hovering := false
 
 func _ready() -> void:
+	return # TODO: Review for version 2
+
 	mouse_entered.connect(on_mouse_entered)
 	mouse_exited.connect(on_mouse_exited)
 	if toggle_mode:

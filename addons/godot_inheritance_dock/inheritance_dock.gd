@@ -3,8 +3,6 @@ extends PanelContainer
 
 ## The main interface.
 
-##### CLASSES #####
-
 ##### SIGNALS #####
 
 signal load_failed
@@ -18,6 +16,8 @@ signal edit_scene_request(p_scene_path: String)
 signal new_res_request(p_script_path: String)
 signal edit_res_request(p_res_path: String)
 signal file_selected(p_file: String)
+
+##### CLASSES #####
 
 ##### CONSTANTS #####
 
@@ -36,6 +36,7 @@ const RES_ICON = preload("icons/icon_resource.svg")
 const SCENE_ICON = preload("icons/icon_scene.svg")
 const BASETYPE_ICON = preload("icons/icon_basetype.svg")
 const FOLDER_ICON = preload("icons/icon_folder.svg")
+
 const CONFIG_FILE = "godot_inheritance_dock.cfg"
 
 const ICONS = {
@@ -409,6 +410,16 @@ func _on_item_sync_requested(p_popup: FilterMenu, p_item: FilterMenuItem) -> voi
 			var found := false
 			for an_item in a_popup.filter_vbox.get_children():
 				if an_item.name_edit.text == filter_name:
+					# ---------------------------------------------------------
+					# LineEdit misses text_set signal (currently only in
+					# TextEdit implemented) in order to allow setter to
+					# invoke _on_regex_edit_text_changed method for
+					# initial regex compilation.
+					# Keep this band-aid block to remain compatibility
+					# throughout all Godot 4 releases.
+					an_item._regex.compile(regex_text)
+					an_item._update_regex_valid()
+					# ---------------------------------------------------------
 					an_item.regex_edit.text = regex_text
 					an_item.check.button_pressed = checked
 					found = true
