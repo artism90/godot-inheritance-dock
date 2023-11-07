@@ -4,20 +4,20 @@ extends PopupPanel
 ## Container for [code]FilterMenuItem[/code] scenes containing one RegEx rule
 ## per scene.
 
-##### CLASSES #####
-
 ##### SIGNALS #####
 
 signal filters_updated
 signal item_sync_requested(p_popup: PopupPanel, p_item: FilterMenuItem)
 
-##### CONSTANTS #####
+##### CLASSES #####
 
 const FilterMenuItemScene = preload("filter_menu_item.tscn")
 const FilterMenuItem = preload("filter_menu_item.gd")
 const PluginTranslation = preload("plugin_translation.gd")
 
-const CONFIG_PATH = "res://addons/godot_inheritance_dock/godot_inheritance_dock.cfg"
+##### CONSTANTS #####
+
+const CONFIG_FILE = "godot_inheritance_dock.cfg"
 
 ##### EXPORTS #####
 
@@ -98,11 +98,12 @@ func _update_filters() -> void:
 	emit_signal("filters_updated")
 	_ui_dirtied()
 
-func _get_config_save_filters_dict() -> Variant:
+func _get_config_save_filters() -> Array:
 	var dict := {}
 	if not filter_vbox:
 		return filters
 
+	var _filters := []
 	for an_item in filter_vbox.get_children():
 		if not an_item.name_edit.text:
 			continue
@@ -110,7 +111,10 @@ func _get_config_save_filters_dict() -> Variant:
 			"regex_text": an_item.get_regex().get_pattern(),
 			"on": an_item.check.button_pressed
 		}
-	return dict
+		_filters.append(dict)
+		dict = {}
+
+	return _filters
 
 func _set_save_disabled(p_disabled: bool) -> void:
 	save_filters_button.self_modulate = save_filters_button.disabled_color if p_disabled else save_filters_button.natural_color
@@ -126,8 +130,8 @@ func _on_save_filters_button_pressed() -> void:
 	if not _config:
 		return
 
-	_config.set_value("filters", type+"_filters", _get_config_save_filters_dict())
-	_config.save(CONFIG_PATH)
+	_config.set_value("filters", type+"_filters", _get_config_save_filters())
+	_config.save(get_script().get_path().get_base_dir().path_join(CONFIG_FILE))
 	_set_save_disabled(true)
 
 func _on_reload_filters_button_pressed() -> void:
@@ -135,7 +139,12 @@ func _on_reload_filters_button_pressed() -> void:
 		print("WARNING: ({0}::_on_reload_filters_button_pressed) Cannot reload filters! Reason: invalid config reference".format([get_script().get_path()]))
 		return
 
-	var new_filters: Dictionary = _config.get_value("filters", type+"_filters")
+	# TODO: Refactor.
+	var new_filters_array: Array = _config.get_value("filters", type+"_filters")
+	var new_filters := {}
+	for a_filter: Dictionary in new_filters_array:
+		new_filters.merge(a_filter)
+
 	set_filters(new_filters)
 	_set_save_disabled(true)
 
@@ -147,7 +156,12 @@ func _on_item_sync_requested(p_item: FilterMenuItem) -> void:
 func set_config(p_config: ConfigFile) -> void:
 	_config = p_config
 	if _config.has_section_key("filters", type+"_filters"):
-		set_filters(_config.get_value("filters", type+"_filters"))
+		# TODO: Refactor.
+		var new_filters_array: Array = _config.get_value("filters", type+"_filters")
+		var new_filters := {}
+		for a_filter: Dictionary in new_filters_array:
+			new_filters.merge(a_filter)
+		set_filters(new_filters)
 
 func set_filters(p_filters: Variant) -> void:
 	if not filter_vbox:
